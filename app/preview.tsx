@@ -1,7 +1,7 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
-import { useCVContext } from "@/context/CVContext";
 import { CVPreview } from "@/components/CVPreview";
+import { useCVContext } from "@/context/CVContext";
+import React from "react";
+import { StyleSheet, View } from "react-native";
 
 export default function PreviewScreen() {
     const { cvData } = useCVContext();
@@ -16,6 +16,7 @@ export default function PreviewScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#F4F6F9", // Fondo General
+        padding: 16, // Espaciado para enmarcar el CV
     },
 });

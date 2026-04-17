@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
+import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
 
 interface InputFieldProps extends TextInputProps {
   label: string;
@@ -11,8 +11,8 @@ export const InputField= ({ label, error, ...props }: InputFieldProps) => {
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TextInput 
-        style={[styles.input, error && styles.inputError]}
-        placeholderTextColor='#999'
+        style={[styles.input, !!error && styles.inputError]}
+        placeholderTextColor='#7A7A7A' // Color de placeholder institucional
         {...props}
         />
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -22,27 +22,28 @@ export const InputField= ({ label, error, ...props }: InputFieldProps) => {
 
 const styles = StyleSheet.create({
     container: {
-      marginBottom: 10,
+      marginBottom: 16, // Espaciado institucional (múltiplo de 8)
     },
     label: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: '#333',
-      marginBottom: 5,
+      fontSize: 14,
+      fontWeight: '600',
+      color: '#7A7A7A', // Texto Secundario (Labels)
+      marginBottom: 8, // Espaciado institucional
     },
     input: {
+      backgroundColor: '#FFFFFF', // Superficies
       borderWidth: 1,
-      borderColor: '#ddd',
-      borderRadius: 8,
+      borderColor: '#DDDDDD', // Borde neutral y sutil
+      borderRadius: 6, // Borde redondeado para inputs
       padding: 12,
       fontSize: 16,
-      backgroundColor: '#fff',
+      color: '#333333', // Texto Principal
     },
     inputError:{
-        borderColor: 'red',
+        borderColor: '#C41230', // Rojo Politécnico para errores
     },
     errorText: {
-      color: '#e74c3c',
+      color: '#C41230', // Rojo Politécnico
       fontSize: 12,
       marginTop: 4,
     }

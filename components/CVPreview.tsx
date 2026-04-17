@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { CVData } from "../types/cv.types";
 
 interface CVPreviewProps {
@@ -10,12 +10,11 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
   const { personalInfo, experiences, education } = cvData;
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         {/* Header con información personal */}
         <View style={styles.header}>
           <Text style={styles.name}>
-            {personalInfo.fullName || "Tu Nombre"}
+            {personalInfo.fullName || "Nombre Completo"}
           </Text>
           <View style={styles.contactInfo}>
             {personalInfo.email && (
@@ -87,7 +86,6 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
               </Text>
             </View>
           )}
-      </View>
     </ScrollView>
   );
 };
@@ -95,21 +93,28 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF", // Superficies
+    borderRadius: 8,
+    // Sombra institucional
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   content: {
-    padding: 20,
+    padding: 24, // Espaciado institucional
   },
   header: {
     borderBottomWidth: 2,
-    borderBottomColor: "#3498db",
+    borderBottomColor: "#0033A0", // Azul Politécnico
     paddingBottom: 16,
     marginBottom: 24,
   },
   name: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#2c3e50",
+    color: "#333333", // Texto Principal
     marginBottom: 12,
   },
   contactInfo: {
@@ -117,7 +122,7 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 14,
-    color: "#7f8c8d",
+    color: "#7A7A7A", // Texto Secundario
     marginBottom: 4,
   },
   section: {
@@ -126,47 +131,47 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#3498db",
-    marginBottom: 12,
+    color: "#0033A0", // Azul Politécnico
+    marginBottom: 16,
     letterSpacing: 1,
   },
   summaryText: {
     fontSize: 14,
-    color: "#34495e",
-    lineHeight: 20,
+    color: "#333333", // Texto Principal
+    lineHeight: 22,
   },
   item: {
     marginBottom: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#ecf0f1",
+    borderBottomColor: "#EEEEEE", // Gris muy claro para separación
   },
   itemTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#2c3e50",
+    color: "#333333", // Texto Principal
     marginBottom: 4,
   },
   itemSubtitle: {
     fontSize: 14,
-    color: "#7f8c8d",
+    color: "#7A7A7A", // Texto Secundario
     marginBottom: 4,
   },
   itemInstitution: {
     fontSize: 14,
-    color: "#95a5a6",
+    color: "#7A7A7A", // Texto Secundario
     marginBottom: 4,
   },
   itemDate: {
     fontSize: 12,
-    color: "#95a5a6",
+    color: "#7A7A7A", // Texto Secundario
     fontStyle: "italic",
     marginBottom: 8,
   },
   itemDescription: {
-    fontSize: 13,
-    color: "#34495e",
-    lineHeight: 18,
+    fontSize: 14,
+    color: "#333333", // Texto Principal
+    lineHeight: 20,
   },
   emptyState: {
     flex: 1,
@@ -176,7 +181,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: "#95a5a6",
+    color: "#7A7A7A", // Texto Secundario
     textAlign: "center",
     lineHeight: 24,
   },

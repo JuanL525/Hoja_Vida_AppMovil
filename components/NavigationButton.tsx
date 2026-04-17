@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
 
 interface NavigationButtonProps {
     title: string;
@@ -8,14 +8,25 @@ interface NavigationButtonProps {
     style?: ViewStyle;
 }
 
-export const NavigationButton = ({ title, onPress, variant = "primary", style }: NavigationButtonProps) => {
+export const NavigationButton = ({
+  title,
+  onPress,
+  variant = "primary",
+  style,
+}: NavigationButtonProps) => {
+  // Determina el estilo del texto basado en la variante
+  const textStyle = [
+    styles.text,
+    variant === "secondary" ? styles.textSecondary : styles.textPrimary,
+  ];
+
     return (
         <TouchableOpacity 
             style={[styles.button, styles[variant], style]} 
             onPress={onPress}
             activeOpacity={0.8}
         >
-            <Text style={[styles.text, variant === "secondary" && styles.textSecondary]}>{title}</Text>
+      <Text style={textStyle}>{title}</Text>
         </TouchableOpacity>
     );
 }
@@ -29,27 +40,43 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
 
+  // Variante Principal (Azul Politécnico)
     primary: {
-        backgroundColor: "#3498db",
+    backgroundColor: "#0033A0", // Azul Politécnico
+    // Sombra institucional
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
     },
+
+  // Variante Secundaria (Borde Rojo Politécnico)
     secondary: {
-        backgroundColor: "transparent",
-        borderColor: "#3498db",
+    backgroundColor: "#FFFFFF", // Fondo blanco para contraste
+    borderColor: "#C41230", // Borde Rojo Politécnico
         borderWidth: 2,
     },
 
+  // Variante Peligro (Rojo Politécnico)
     danger: {
-        backgroundColor: "#e74c3c",
+    backgroundColor: "#C41230", // Rojo Politécnico
     },
 
+  // Estilo base para el texto
     text: {
-        color: "#fff",
         fontSize: 16,
         fontWeight: "600",
     },
 
+  // Color de texto para variantes primary y danger
+  textPrimary: {
+    color: "#FFFFFF",
+  },
+
+  // Color de texto para la variante secondary
     textSecondary: {
-        color: "#3498db",
+    color: "#C41230", // Texto Rojo Politécnico
     },
 
 })

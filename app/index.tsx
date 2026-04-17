@@ -1,13 +1,13 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import React from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { NavigationButton } from "../components/NavigationButton";
 import { useCVContext } from "../context/CVContext";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { cvData } = useCVContext();
-
-  console.log("CV Data cargado:", cvData); // Para debugging
 
   const isPersonalInfoComplete =
     cvData.personalInfo.fullName && cvData.personalInfo.email;
@@ -15,102 +15,122 @@ export default function HomeScreen() {
   const hasEducation = cvData.education.length > 0;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Crea tu CV Profesional</Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.title}>Crea tu CV Profesional</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>1. Información Personal</Text>
-        <Text style={styles.status}>
-          {isPersonalInfoComplete ? "✓ Completado" : "Pendiente"}
-        </Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push("/personal-info")}
-        >
-          <Text style={styles.buttonText}>Editar</Text>
-        </TouchableOpacity>
-      </View>
+        {/* --- Sección Información Personal --- */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>1. Información Personal</Text>
+          <Text
+            style={[
+              styles.status,
+              isPersonalInfoComplete
+                ? styles.statusComplete
+                : styles.statusPending,
+            ]}
+          >
+            {isPersonalInfoComplete ? "✓ Completado" : "Pendiente"}
+          </Text>
+          <NavigationButton
+            title={isPersonalInfoComplete ? "Editar" : "Completar"}
+            onPress={() => router.push("/personal-info")}
+            variant="secondary"
+          />
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>2. Experiencia</Text>
-        <Text style={styles.status}>
-          {hasExperience
-            ? `✓ ${cvData.experiences.length} agregada(s)`
-            : "Pendiente"}
-        </Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push("/experience")}
-        >
-          <Text style={styles.buttonText}>Agregar</Text>
-        </TouchableOpacity>
-      </View>
+        {/* --- Sección Experiencia --- */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>2. Experiencia Laboral</Text>
+          <Text
+            style={[
+              styles.status,
+              hasExperience ? styles.statusComplete : styles.statusPending,
+            ]}
+          >
+            {hasExperience
+              ? `✓ ${cvData.experiences.length} agregada(s)`
+              : "Pendiente"}
+          </Text>
+          <NavigationButton
+            title="Agregar/Editar"
+            onPress={() => router.push("/experience")}
+            variant="secondary"
+          />
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>3. Educación</Text>
-        <Text style={styles.status}>
-          {hasEducation
-            ? `✓ ${cvData.education.length} agregada(s)`
-            : "Pendiente"}
-        </Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push("/education")}
-        >
-          <Text style={styles.buttonText}>Agregar</Text>
-        </TouchableOpacity>
-      </View>
+        {/* --- Sección Educación --- */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>3. Educación</Text>
+          <Text
+            style={[
+              styles.status,
+              hasEducation ? styles.statusComplete : styles.statusPending,
+            ]}
+          >
+            {hasEducation
+              ? `✓ ${cvData.education.length} agregada(s)`
+              : "Pendiente"}
+          </Text>
+          <NavigationButton
+            title="Agregar/Editar"
+            onPress={() => router.push("/education")}
+            variant="secondary"
+          />
+        </View>
 
-      <View style={{ marginTop: 30 }}>
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#2ecc71" }]}
+        {/* --- Botón de Vista Previa --- */}
+        <NavigationButton
+          title="Ver Vista Previa del CV"
           onPress={() => router.push("/preview")}
-        >
-          <Text style={styles.buttonText}>Ver Vista Previa del CV</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          style={{ marginTop: 24 }}
+        />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#F4F6F9", // Fondo General
+  },
+  content: {
+    padding: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
-    color: "#2c3e50",
+    color: "#0033A0", // Azul Politécnico
+    marginBottom: 24,
+    textAlign: "center",
   },
-  section: {
-    backgroundColor: "#fff",
+  card: {
+    backgroundColor: "#FFFFFF", // Superficies
+    borderRadius: 8, // Borde redondeado para tarjetas
     padding: 16,
-    borderRadius: 12,
     marginBottom: 16,
+    // Sombra institucional
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  sectionTitle: {
+  cardTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#2c3e50",
+    color: "#333333", // Texto Principal
     marginBottom: 8,
   },
   status: {
     fontSize: 14,
-    color: "#27ae60",
     marginBottom: 12,
   },
-  button: {
-    backgroundColor: "#3498db",
-    padding: 16,
-    borderRadius: 8,
+  statusComplete: {
+    color: "#27ae60", // Se mantiene verde para 'completado' por buena UX
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    textAlign: "center",
-    fontWeight: "600",
+  statusPending: {
+    color: "#7A7A7A", // Texto Secundario para 'pendiente'
   },
 });

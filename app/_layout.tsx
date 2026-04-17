@@ -1,12 +1,12 @@
-import {Stack} from "expo-router";
 import { CVProvider } from "@/context/CVContext";
+import { Stack } from "expo-router";
 
 export default function RootLayout() {
   return (
     <CVProvider>
       <Stack 
         screenOptions={{
-          headerStyle: { backgroundColor: '#3498db' },
+          headerStyle: { backgroundColor: '#0033A0' }, // Azul Politécnico
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: 'bold' },
         }}
