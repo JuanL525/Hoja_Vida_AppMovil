@@ -31,6 +31,10 @@ export default function PersonalInfoScreen() {
     ]);
   };
 
+  const handleSaveError = () => {
+    Alert.alert("Error", "No se puede guardar. Por favor, revisa los errores en el formulario.");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -38,7 +42,13 @@ export default function PersonalInfoScreen() {
           {/* --- Campo Nombre Completo --- */}
           <Controller
             control={control}
-            rules={{ required: "El nombre completo es obligatorio." }}
+            rules={{
+              required: "El nombre completo es obligatorio.",
+              pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                message: "El nombre solo debe contener letras y espacios.",
+              },
+            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <InputField
                 label="Nombre Completo *"
@@ -96,6 +106,12 @@ export default function PersonalInfoScreen() {
           {/* --- Campo Ubicación --- */}
           <Controller
             control={control}
+            rules={{
+              pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.,-]+$/,
+                message: "La ubicación contiene caracteres no válidos.",
+              },
+            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <InputField
                 label="Ubicación"
@@ -103,6 +119,7 @@ export default function PersonalInfoScreen() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                error={errors.location?.message}
               />
             )}
             name="location"
@@ -128,7 +145,7 @@ export default function PersonalInfoScreen() {
 
           <NavigationButton
             title="Guardar Información"
-            onPress={handleSubmit(handleSave)}
+            onPress={handleSubmit(handleSave, handleSaveError)}
           />
 
           <NavigationButton

@@ -64,6 +64,10 @@ export default function ExperienceScreen() {
     Alert.alert("Éxito", "Experiencia agregada correctamente");
   };
 
+  const handleAddError = () => {
+    Alert.alert("Error", "No se puede agregar. Por favor, revisa los errores en el formulario.");
+  };
+
   const handleDelete = (id: string) => {
     Alert.alert("Confirmar", "¿Estás seguro de eliminar esta experiencia?", [
       { text: "Cancelar", style: "cancel" },
@@ -100,7 +104,13 @@ export default function ExperienceScreen() {
           {/* --- Campo Empresa --- */}
           <Controller
             control={control}
-            rules={{ required: "El nombre de la empresa es obligatorio." }}
+            rules={{
+              required: "El nombre de la empresa es obligatorio.",
+              pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.,&]+$/,
+                message: "El nombre de la empresa contiene caracteres no válidos.",
+              },
+            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <InputField
                 label="Empresa *"
@@ -117,7 +127,13 @@ export default function ExperienceScreen() {
           {/* --- Campo Cargo --- */}
           <Controller
             control={control}
-            rules={{ required: "El cargo es obligatorio." }}
+            rules={{
+              required: "El cargo es obligatorio.",
+              pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                message: "El cargo solo debe contener letras y espacios.",
+              },
+            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <InputField
                 label="Cargo *"
@@ -220,7 +236,7 @@ export default function ExperienceScreen() {
 
           <NavigationButton
             title="Agregar Experiencia"
-            onPress={handleSubmit(handleAdd)}
+            onPress={handleSubmit(handleAdd, handleAddError)}
           />
 
           {/* --- Lista de Experiencias --- */}

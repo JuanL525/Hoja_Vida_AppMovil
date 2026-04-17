@@ -60,6 +60,10 @@ export default function EducationScreen() {
     Alert.alert("Éxito", "Educación agregada correctamente");
   };
 
+  const handleAddError = () => {
+    Alert.alert("Error", "No se puede agregar. Por favor, revisa los errores en el formulario.");
+  };
+
   const handleDelete = (id: string) => {
     Alert.alert("Confirmar", "¿Estás seguro de eliminar esta educación?", [
       { text: "Cancelar", style: "cancel" },
@@ -92,7 +96,13 @@ export default function EducationScreen() {
           {/* --- Campo Institución --- */}
           <Controller
             control={control}
-            rules={{ required: "La institución es obligatoria." }}
+            rules={{
+              required: "La institución es obligatoria.",
+              pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.,]+$/,
+                message: "El nombre de la institución contiene caracteres no válidos.",
+              },
+            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <InputField
                 label="Institución *"
@@ -100,18 +110,22 @@ export default function EducationScreen() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                error={errors.institution?.message}
               />
             )}
             name="institution"
           />
-          {errors.institution && (
-            <Text style={styles.errorText}>{errors.institution.message}</Text>
-          )}
 
           {/* --- Campo Título/Grado --- */}
           <Controller
             control={control}
-            rules={{ required: "El título/grado es obligatorio." }}
+            rules={{
+              required: "El título/grado es obligatorio.",
+              pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.,]+$/,
+                message: "El título solo debe contener letras y caracteres válidos.",
+              },
+            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <InputField
                 label="Título/Grado *"
@@ -119,17 +133,21 @@ export default function EducationScreen() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                error={errors.degree?.message}
               />
             )}
             name="degree"
           />
-          {errors.degree && (
-            <Text style={styles.errorText}>{errors.degree.message}</Text>
-          )}
 
           {/* --- Campo Área de Estudio --- */}
           <Controller
             control={control}
+            rules={{
+              pattern: {
+                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                message: "El área de estudio solo debe contener letras y espacios.",
+              },
+            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <InputField
                 label="Área de Estudio"
@@ -137,12 +155,13 @@ export default function EducationScreen() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
+                error={errors.field?.message}
               />
             )}
             name="field"
           />
 
-          {/* --- Campo Año de Graduación (con DatePicker) --- */}
+          {/*Campo Año de Graduación*/}
           <Controller
             control={control}
             name="graduationYear"
@@ -183,7 +202,7 @@ export default function EducationScreen() {
 
           <NavigationButton
             title="Agregar Educación"
-            onPress={handleSubmit(handleAdd)}
+            onPress={handleSubmit(handleAdd, handleAddError)}
           />
 
           {cvData.education.length > 0 && (
