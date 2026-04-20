@@ -29,9 +29,11 @@ export default function RootLayout() {
         />
         <Stack.Screen 
           name="preview"
-          options={{ title: "Vista Previa", presentation: "modal",
-
-           }}
+          options={{ title: "Vista Previa", presentation: "modal",}}
+        />
+        <Stack.Screen 
+          name="skills"
+          options={{ title: "Habilidades" }}
         />
       </Stack>
     </CVProvider>

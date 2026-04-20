@@ -1,6 +1,6 @@
+import { useForm } from "@tanstack/react-form";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -13,140 +13,138 @@ export default function PersonalInfoScreen() {
   const router = useRouter();
   const { cvData, updatePersonalInfo } = useCVContext();
 
-  // --- Configuración de React Hook Form ---
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<PersonalInfo>({
+  // --- Configuración de TanStack Form ---
+  const form = useForm({
     defaultValues: cvData.personalInfo,
-    mode: "onChange", // Validar al cambiar el valor del campo
+    onSubmit: async ({ value }) => {
+      updatePersonalInfo(value as PersonalInfo);
+      Alert.alert("Éxito", "Información personal guardada.", [
+        { text: "OK", onPress: () => router.back() },
+      ]);
+    },
+    onSubmitInvalid: () => {
+      Alert.alert(
+        "Error",
+        "No se puede guardar. Por favor, revisa los errores en el formulario.",
+      );
+    },
   });
-
-  // --- Manejador para guardar ---
-  const handleSave = (data: PersonalInfo) => {
-    updatePersonalInfo(data);
-    Alert.alert("Éxito", "Información personal guardada.", [
-      { text: "OK", onPress: () => router.back() },
-    ]);
-  };
-
-  const handleSaveError = () => {
-    Alert.alert("Error", "No se puede guardar. Por favor, revisa los errores en el formulario.");
-  };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.content}>
           {/* --- Campo Nombre Completo --- */}
-          <Controller
-            control={control}
-            rules={{
-              required: "El nombre completo es obligatorio.",
-              pattern: {
-                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
-                message: "El nombre solo debe contener letras y espacios.",
+          <form.Field
+            name="fullName"
+            validators={{
+              onChange: ({ value }) => {
+                if (!value) return "El nombre completo es obligatorio.";
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(value))
+                  return "El nombre solo debe contener letras y espacios.";
+                return undefined;
               },
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
+          >
+            {(field) => (
               <InputField
                 label="Nombre Completo *"
                 placeholder="Juan Pérez"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                error={errors.fullName?.message}
+                onBlur={field.handleBlur}
+                onChangeText={(text) => field.handleChange(text)}
+                value={field.state.value}
+                error={field.state.meta.errors?.[0]?.toString()}
               />
             )}
-            name="fullName"
-          />
+          </form.Field>
 
           {/* --- Campo Email --- */}
-          <Controller
-            control={control}
-            rules={{
-              required: "El email es obligatorio.",
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Formato de email inválido.",
+          <form.Field
+            name="email"
+            validators={{
+              onChange: ({ value }) => {
+                if (!value) return "El email es obligatorio.";
+                if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value))
+                  return "Formato de email inválido.";
+                return undefined;
               },
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
+          >
+            {(field) => (
               <InputField
                 label="Email *"
                 placeholder="juan@email.com"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                error={errors.email?.message}
+                onBlur={field.handleBlur}
+                onChangeText={(text) => field.handleChange(text)}
+                value={field.state.value}
+                error={field.state.meta.errors?.[0]?.toString()}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
             )}
-            name="email"
-          />
+          </form.Field>
 
           {/* --- Campo Teléfono --- */}
-          <Controller
-            control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
+          <form.Field name="phone">
+            {(field) => (
               <InputField
                 label="Teléfono"
                 placeholder="+593 00 000 000"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
+                onBlur={field.handleBlur}
+                onChangeText={(text) => field.handleChange(text)}
+                value={field.state.value}
                 keyboardType="phone-pad"
               />
             )}
-            name="phone"
-          />
+          </form.Field>
 
           {/* --- Campo Ubicación --- */}
-          <Controller
-            control={control}
-            rules={{
-              pattern: {
-                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.,-]+$/,
-                message: "La ubicación contiene caracteres no válidos.",
+          <form.Field
+            name="location"
+            validators={{
+              onChange: ({ value }) => {
+                if (value && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.,-]+$/.test(value))
+                  return "La ubicación contiene caracteres no válidos.";
+                return undefined;
               },
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
+          >
+            {(field) => (
               <InputField
                 label="Ubicación"
                 placeholder="Quito, Ecuador"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                error={errors.location?.message}
+                onBlur={field.handleBlur}
+                onChangeText={(text) => field.handleChange(text)}
+                value={field.state.value}
+                error={field.state.meta.errors?.[0]?.toString()}
               />
             )}
-            name="location"
-          />
+          </form.Field>
 
           {/* --- Campo Resumen Profesional --- */}
-          <Controller
-            control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
+          <form.Field name="summary">
+            {(field) => (
               <InputField
                 label="Resumen Profesional"
                 placeholder="Describe brevemente tu perfil profesional y tus objetivos."
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
+                onBlur={field.handleBlur}
+                onChangeText={(text) => field.handleChange(text)}
+                value={field.state.value}
                 multiline
                 numberOfLines={4}
                 style={{ height: 100, textAlignVertical: "top" }}
               />
             )}
-            name="summary"
-          />
+          </form.Field>
 
-          <NavigationButton
-            title="Guardar Información"
-            onPress={handleSubmit(handleSave, handleSaveError)}
-          />
+          <form.Subscribe selector={(state) => [state.canSubmit]}>
+            {([canSubmit]) => (
+              <NavigationButton
+                title="Guardar Información"
+                onPress={form.handleSubmit}
+              />
+            )}
+          </form.Subscribe>
 
           <NavigationButton
             title="Volver al Inicio"

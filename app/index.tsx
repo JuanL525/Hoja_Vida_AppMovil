@@ -13,6 +13,7 @@ export default function HomeScreen() {
     cvData.personalInfo.fullName && cvData.personalInfo.email;
   const hasExperience = cvData.experiences.length > 0;
   const hasEducation = cvData.education.length > 0;
+  const hasSkills = cvData.skills.length > 0;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -75,6 +76,24 @@ export default function HomeScreen() {
           <NavigationButton
             title="Agregar/Editar"
             onPress={() => router.push("/education")}
+            variant="secondary"
+          />
+        </View>
+
+        {/* --- Sección Habilidades --- */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>4. Habilidades</Text>
+          <Text
+            style={[
+              styles.status,
+              hasSkills ? styles.statusComplete : styles.statusPending,
+            ]}
+          >
+            {hasSkills ? `✓ ${cvData.skills.length} agregada(s)` : "Pendiente"}
+          </Text>
+          <NavigationButton
+            title="Agregar/Editar"
+            onPress={() => router.push("/skills")}
             variant="secondary"
           />
         </View>

@@ -24,12 +24,12 @@ Debes utilizar estrictamente estos códigos HEX en los estilos de los componente
     * *iOS:* `shadowColor: "#000", shadowOffset: {width: 0, height: 2}, shadowOpacity: 0.1, shadowRadius: 4`
 * **Espaciado (Padding/Margin):** Usa múltiplos de 4 u 8 para mantener la proporción (ej. `8px`, `16px`, `24px`).
 
-## 3. Reglas para Formularios (React Hook Form)
-Cada vez que generes o modifiques un formulario, debes cumplir con esto:
-* Usa siempre `useForm` de `react-hook-form`.
-* Configura el modo de validación en tiempo de ejecución: `mode: 'onChange'` o `mode: 'onBlur'`.
-* Todos los campos deben estar envueltos en el componente `<Controller />`.
-* Los mensajes de error deben mostrarse debajo del input correspondiente en texto pequeño (`fontSize: 12`) y usar el **Rojo Politécnico**.
+## 3. Reglas para Formularios (TanStack Form)
+* **ESTRICTO:** El proyecto ha migrado a `@tanstack/react-form`. **NO utilices `react-hook-form`**.
+* Utiliza el hook `useForm` de `@tanstack/react-form`.
+* Cada campo debe estar envuelto en el componente `<form.Field>`.
+* Accede al estado del valor y los errores a través de los parámetros del render prop del campo (ej. `field.state.value`, `field.state.meta.errors`).
+* Los mensajes de error deben mostrarse usando el **Rojo Politécnico** (`#C41230`) en texto pequeño (`fontSize: 12`).
 
 ## 4. Reglas para Fechas (DatePicker)
 * Utiliza exclusivamente `@react-native-community/datetimepicker` para el manejo de fechas.

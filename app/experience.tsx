@@ -1,16 +1,16 @@
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import { useForm } from "@tanstack/react-form";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -26,14 +26,8 @@ export default function ExperienceScreen() {
   const router = useRouter();
   const { cvData, addExperience, deleteExperience } = useCVContext();
 
-  // --- Configuración de React Hook Form ---
-  const {
-    control,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm<ExperienceFormData>({
+  // --- Configuración de TanStack Form ---
+  const form = useForm({
     defaultValues: {
       company: "",
       position: "",
@@ -41,7 +35,21 @@ export default function ExperienceScreen() {
       endDate: "",
       description: "",
     },
-    mode: "onChange",
+    onSubmit: async ({ value }) => {
+      const newExperience: Experience = {
+        id: Date.now().toString(),
+        ...value,
+      };
+      addExperience(newExperience);
+      form.reset();
+      Alert.alert("Éxito", "Experiencia agregada correctamente");
+    },
+    onSubmitInvalid: () => {
+      Alert.alert(
+        "Error",
+        "No se puede agregar. Por favor, revisa los errores en el formulario.",
+      );
+    },
   });
 
   // --- Estado para el DatePicker ---
@@ -51,21 +59,6 @@ export default function ExperienceScreen() {
 
   const handleShowDatePicker = (target: "startDate" | "endDate") => {
     setDatePickerTarget(target);
-  };
-
-  // --- Manejadores de eventos ---
-  const handleAdd = (data: ExperienceFormData) => {
-    const newExperience: Experience = {
-      id: Date.now().toString(),
-      ...data,
-    };
-    addExperience(newExperience);
-    reset();
-    Alert.alert("Éxito", "Experiencia agregada correctamente");
-  };
-
-  const handleAddError = () => {
-    Alert.alert("Error", "No se puede agregar. Por favor, revisa los errores en el formulario.");
   };
 
   const handleDelete = (id: string) => {
@@ -91,7 +84,7 @@ export default function ExperienceScreen() {
 
       const finalDate =
         formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
-      setValue(datePickerTarget, finalDate, { shouldValidate: true });
+      form.setFieldValue(datePickerTarget, finalDate);
     }
   };
 
@@ -102,90 +95,93 @@ export default function ExperienceScreen() {
           <Text style={styles.sectionTitle}>Agregar Nueva Experiencia</Text>
 
           {/* --- Campo Empresa --- */}
-          <Controller
-            control={control}
-            rules={{
-              required: "El nombre de la empresa es obligatorio.",
-              pattern: {
-                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.,&]+$/,
-                message: "El nombre de la empresa contiene caracteres no válidos.",
+          <form.Field
+            name="company"
+            validators={{
+              onChange: ({ value }) => {
+                if (!value) return "El nombre de la empresa es obligatorio.";
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.,&]+$/.test(value))
+                  return "El nombre de la empresa contiene caracteres no válidos.";
+                return undefined;
               },
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
+          >
+            {(field) => (
               <InputField
                 label="Empresa *"
                 placeholder="Nombre de la empresa"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                error={errors.company?.message}
+                onBlur={field.handleBlur}
+                onChangeText={(text) => field.handleChange(text)}
+                value={field.state.value}
+                error={field.state.meta.errors?.[0]?.toString()}
               />
             )}
-            name="company"
-          />
+          </form.Field>
 
           {/* --- Campo Cargo --- */}
-          <Controller
-            control={control}
-            rules={{
-              required: "El cargo es obligatorio.",
-              pattern: {
-                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
-                message: "El cargo solo debe contener letras y espacios.",
+          <form.Field
+            name="position"
+            validators={{
+              onChange: ({ value }) => {
+                if (!value) return "El cargo es obligatorio.";
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(value))
+                  return "El cargo solo debe contener letras y espacios.";
+                return undefined;
               },
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
+          >
+            {(field) => (
               <InputField
                 label="Cargo *"
                 placeholder="Tu posición"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                error={errors.position?.message}
+                onBlur={field.handleBlur}
+                onChangeText={(text) => field.handleChange(text)}
+                value={field.state.value}
+                error={field.state.meta.errors?.[0]?.toString()}
               />
             )}
-            name="position"
-          />
+          </form.Field>
 
           {/* --- Campo Fecha de Inicio --- */}
-          <Controller
-            control={control}
-            rules={{ required: "La fecha de inicio es obligatoria." }}
+          <form.Field
             name="startDate"
-            render={({ field: { value } }) => (
+            validators={{
+              onChange: ({ value }) =>
+                !value ? "La fecha de inicio es obligatoria." : undefined,
+            }}
+          >
+            {(field) => (
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Fecha de Inicio *</Text>
                 <TouchableOpacity
                   style={[
                     styles.datePickerInput,
-                    !!errors.startDate && styles.inputError,
+                    field.state.meta.errors.length > 0 && styles.inputError,
                   ]}
                   onPress={() => handleShowDatePicker("startDate")}
                 >
                   <Text
                     style={
-                      value
+                      field.state.value
                         ? styles.datePickerText
                         : styles.datePickerPlaceholder
                     }
                   >
-                    {value || "Seleccionar fecha"}
+                    {field.state.value || "Seleccionar fecha"}
                   </Text>
                 </TouchableOpacity>
-                {errors.startDate && (
+                {field.state.meta.errors.length > 0 && (
                   <Text style={styles.errorText}>
-                    {errors.startDate.message}
+                    {field.state.meta.errors[0]?.toString()}
                   </Text>
                 )}
               </View>
             )}
-          />
+          </form.Field>
 
           {/* --- Campo Fecha de Fin --- */}
-          <Controller
-            control={control}
-            name="endDate"
-            render={({ field: { value } }) => (
+          <form.Field name="endDate">
+            {(field) => (
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Fecha de Fin</Text>
                 <TouchableOpacity
@@ -194,17 +190,17 @@ export default function ExperienceScreen() {
                 >
                   <Text
                     style={
-                      value
+                      field.state.value
                         ? styles.datePickerText
                         : styles.datePickerPlaceholder
                     }
                   >
-                    {value || "Seleccionar fecha o dejar en blanco"}
+                    {field.state.value || "Seleccionar fecha o dejar en blanco"}
                   </Text>
                 </TouchableOpacity>
               </View>
             )}
-          />
+          </form.Field>
 
           {/* --- DatePicker Modal --- */}
           {datePickerTarget && (
@@ -217,27 +213,29 @@ export default function ExperienceScreen() {
           )}
 
           {/* --- Campo Descripción --- */}
-          <Controller
-            control={control}
-            name="description"
-            render={({ field: { onChange, onBlur, value } }) => (
+          <form.Field name="description">
+            {(field) => (
               <InputField
                 label="Descripción"
                 placeholder="Describe tus responsabilidades y logros..."
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
+                onBlur={field.handleBlur}
+                onChangeText={(text) => field.handleChange(text)}
+                value={field.state.value}
                 multiline
                 numberOfLines={4}
                 style={{ height: 100, textAlignVertical: "top" }}
               />
             )}
-          />
+          </form.Field>
 
-          <NavigationButton
-            title="Agregar Experiencia"
-            onPress={handleSubmit(handleAdd, handleAddError)}
-          />
+          <form.Subscribe selector={(state) => [state.canSubmit]}>
+            {([canSubmit]) => (
+              <NavigationButton
+                title="Agregar Experiencia"
+                onPress={form.handleSubmit}
+              />
+            )}
+          </form.Subscribe>
 
           {/* --- Lista de Experiencias --- */}
           {cvData.experiences.length > 0 && (

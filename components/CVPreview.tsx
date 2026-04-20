@@ -7,85 +7,101 @@ interface CVPreviewProps {
 }
 
 export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
-  const { personalInfo, experiences, education } = cvData;
+  const { personalInfo, experiences, education, skills } = cvData;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        {/* Header con información personal */}
-        <View style={styles.header}>
-          <Text style={styles.name}>
-            {personalInfo.fullName || "Nombre Completo"}
-          </Text>
-          <View style={styles.contactInfo}>
-            {personalInfo.email && (
-              <Text style={styles.contactText}>📧 {personalInfo.email}</Text>
-            )}
-            {personalInfo.phone && (
-              <Text style={styles.contactText}>📱 {personalInfo.phone}</Text>
-            )}
-            {personalInfo.location && (
-              <Text style={styles.contactText}>📍 {personalInfo.location}</Text>
-            )}
+      {/* Header con información personal */}
+      <View style={styles.header}>
+        <Text style={styles.name}>
+          {personalInfo.fullName || "Nombre Completo"}
+        </Text>
+        <View style={styles.contactInfo}>
+          {personalInfo.email && (
+            <Text style={styles.contactText}>📧 {personalInfo.email}</Text>
+          )}
+          {personalInfo.phone && (
+            <Text style={styles.contactText}>📱 {personalInfo.phone}</Text>
+          )}
+          {personalInfo.location && (
+            <Text style={styles.contactText}>📍 {personalInfo.location}</Text>
+          )}
+        </View>
+      </View>
+
+      {/* Resumen profesional */}
+      {personalInfo.summary && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>RESUMEN PROFESIONAL</Text>
+          <Text style={styles.summaryText}>{personalInfo.summary}</Text>
+        </View>
+      )}
+
+      {/* Experiencia laboral */}
+      {experiences.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>EXPERIENCIA LABORAL</Text>
+          {experiences.map((exp) => (
+            <View key={exp.id} style={styles.item}>
+              <Text style={styles.itemTitle}>{exp.position}</Text>
+              <Text style={styles.itemSubtitle}>{exp.company}</Text>
+              <Text style={styles.itemDate}>
+                {exp.startDate} - {exp.endDate || "Actual"}
+              </Text>
+              {exp.description && (
+                <Text style={styles.itemDescription}>{exp.description}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Educación */}
+      {education.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>EDUCACIÓN</Text>
+          {education.map((edu) => (
+            <View key={edu.id} style={styles.item}>
+              <Text style={styles.itemTitle}>{edu.degree}</Text>
+              {edu.field && (
+                <Text style={styles.itemSubtitle}>{edu.field}</Text>
+              )}
+              <Text style={styles.itemInstitution}>{edu.institution}</Text>
+              {edu.graduationYear && (
+                <Text style={styles.itemDate}>{edu.graduationYear}</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Habilidades */}
+      {skills.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>HABILIDADES</Text>
+          <View style={styles.skillsContainer}>
+            {skills.map((skill) => (
+              <View key={skill.id} style={styles.skillBadge}>
+                <Text style={styles.skillName}>{skill.name}</Text>
+                <Text style={styles.skillLevel}>{skill.level}</Text>
+              </View>
+            ))}
           </View>
         </View>
+      )}
 
-        {/* Resumen profesional */}
-        {personalInfo.summary && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>RESUMEN PROFESIONAL</Text>
-            <Text style={styles.summaryText}>{personalInfo.summary}</Text>
+      {/* Mensaje si no hay datos */}
+      {!personalInfo.fullName &&
+        experiences.length === 0 &&
+        education.length === 0 &&
+        skills.length === 0 && (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyText}>
+              No hay información para mostrar.{"\n"}
+              Completa las secciones para ver tu CV.
+            </Text>
           </View>
         )}
-
-        {/* Experiencia laboral */}
-        {experiences.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>EXPERIENCIA LABORAL</Text>
-            {experiences.map((exp) => (
-              <View key={exp.id} style={styles.item}>
-                <Text style={styles.itemTitle}>{exp.position}</Text>
-                <Text style={styles.itemSubtitle}>{exp.company}</Text>
-                <Text style={styles.itemDate}>
-                  {exp.startDate} - {exp.endDate || "Actual"}
-                </Text>
-                {exp.description && (
-                  <Text style={styles.itemDescription}>{exp.description}</Text>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Educación */}
-        {education.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>EDUCACIÓN</Text>
-            {education.map((edu) => (
-              <View key={edu.id} style={styles.item}>
-                <Text style={styles.itemTitle}>{edu.degree}</Text>
-                {edu.field && (
-                  <Text style={styles.itemSubtitle}>{edu.field}</Text>
-                )}
-                <Text style={styles.itemInstitution}>{edu.institution}</Text>
-                {edu.graduationYear && (
-                  <Text style={styles.itemDate}>{edu.graduationYear}</Text>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Mensaje si no hay datos */}
-        {!personalInfo.fullName &&
-          experiences.length === 0 &&
-          education.length === 0 && (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>
-                No hay información para mostrar.{"\n"}
-                Completa las secciones para ver tu CV.
-              </Text>
-            </View>
-          )}
     </ScrollView>
   );
 };
@@ -184,5 +200,26 @@ const styles = StyleSheet.create({
     color: "#7A7A7A", // Texto Secundario
     textAlign: "center",
     lineHeight: 24,
+  },
+  skillsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  skillBadge: {
+    backgroundColor: "#F4F6F9", // Fondo General
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+  },
+  skillName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#0033A0", // Azul Politécnico
+  },
+  skillLevel: {
+    fontSize: 12,
+    color: "#7A7A7A", // Texto Secundario
+    marginTop: 2,
   },
 });

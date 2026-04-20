@@ -1,9 +1,9 @@
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import { useForm } from "@tanstack/react-form";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
   Platform,
@@ -27,42 +27,33 @@ export default function EducationScreen() {
   const router = useRouter();
   const { cvData, addEducation, deleteEducation } = useCVContext();
 
-  // --- Configuración de React Hook Form ---
-  const {
-    control,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm<EducationFormData>({
+  // --- Configuración de TanStack Form ---
+  const form = useForm({
     defaultValues: {
       institution: "",
       degree: "",
       field: "",
       graduationYear: "",
     },
-    mode: "onChange", // Validación al cambiar el contenido del input
+    onSubmit: async ({ value }) => {
+      const newEducation: Education = {
+        id: Date.now().toString(),
+        ...value,
+      };
+      addEducation(newEducation);
+      form.reset();
+      Alert.alert("Éxito", "Educación agregada correctamente");
+    },
+    onSubmitInvalid: () => {
+      Alert.alert(
+        "Error",
+        "No se puede agregar. Por favor, revisa los errores en el formulario.",
+      );
+    },
   });
 
   // --- Estado para el DatePicker ---
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const graduationYearValue = control._getWatch("graduationYear");
-
-  // --- Manejadores de eventos ---
-  const handleAdd = (data: EducationFormData) => {
-    const newEducation: Education = {
-      id: Date.now().toString(),
-      ...data,
-    };
-
-    addEducation(newEducation);
-    reset(); // Limpiar el formulario después de agregar
-    Alert.alert("Éxito", "Educación agregada correctamente");
-  };
-
-  const handleAddError = () => {
-    Alert.alert("Error", "No se puede agregar. Por favor, revisa los errores en el formulario.");
-  };
 
   const handleDelete = (id: string) => {
     Alert.alert("Confirmar", "¿Estás seguro de eliminar esta educación?", [
@@ -75,15 +66,12 @@ export default function EducationScreen() {
     ]);
   };
 
-  const onDateChange = (
-    event: DateTimePickerEvent,
-    selectedDate?: Date
-  ) => {
+  const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === "ios");
     if (selectedDate) {
       // Formateamos la fecha para obtener solo el año y la establecemos en el formulario
       const year = selectedDate.getFullYear().toString();
-      setValue("graduationYear", year, { shouldValidate: true });
+      form.setFieldValue("graduationYear", year);
     }
   };
 
@@ -94,78 +82,79 @@ export default function EducationScreen() {
           <Text style={styles.sectionTitle}>Agregar Nueva Educación</Text>
 
           {/* --- Campo Institución --- */}
-          <Controller
-            control={control}
-            rules={{
-              required: "La institución es obligatoria.",
-              pattern: {
-                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.,]+$/,
-                message: "El nombre de la institución contiene caracteres no válidos.",
+          <form.Field
+            name="institution"
+            validators={{
+              onChange: ({ value }) => {
+                if (!value) return "La institución es obligatoria.";
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.,]+$/.test(value))
+                  return "El nombre de la institución contiene caracteres no válidos.";
+                return undefined;
               },
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
+          >
+            {(field) => (
               <InputField
                 label="Institución *"
                 placeholder="Nombre de la universidad/institución"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                error={errors.institution?.message}
+                onBlur={field.handleBlur}
+                onChangeText={(text) => field.handleChange(text)}
+                value={field.state.value}
+                error={field.state.meta.errors?.[0]?.toString()}
               />
             )}
-            name="institution"
-          />
+          </form.Field>
 
           {/* --- Campo Título/Grado --- */}
-          <Controller
-            control={control}
-            rules={{
-              required: "El título/grado es obligatorio.",
-              pattern: {
-                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.,]+$/,
-                message: "El título solo debe contener letras y caracteres válidos.",
+          <form.Field
+            name="degree"
+            validators={{
+              onChange: ({ value }) => {
+                if (!value) return "El título/grado es obligatorio.";
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.,]+$/.test(value))
+                  return "El título solo debe contener letras y caracteres válidos.";
+                return undefined;
               },
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
+          >
+            {(field) => (
               <InputField
                 label="Título/Grado *"
                 placeholder="Ej: Licenciatura, Maestría"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                error={errors.degree?.message}
+                onBlur={field.handleBlur}
+                onChangeText={(text) => field.handleChange(text)}
+                value={field.state.value}
+                error={field.state.meta.errors?.[0]?.toString()}
               />
             )}
-            name="degree"
-          />
+          </form.Field>
 
           {/* --- Campo Área de Estudio --- */}
-          <Controller
-            control={control}
-            rules={{
-              pattern: {
-                value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
-                message: "El área de estudio solo debe contener letras y espacios.",
+          <form.Field
+            name="field"
+            validators={{
+              onChange: ({ value }) => {
+                if (value && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(value))
+                  return "El área de estudio solo debe contener letras y espacios.";
+                return undefined;
               },
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
+          >
+            {(field) => (
               <InputField
                 label="Área de Estudio"
                 placeholder="Ej: Ingeniería en Sistemas"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                error={errors.field?.message}
+                onBlur={field.handleBlur}
+                onChangeText={(text) => field.handleChange(text)}
+                value={field.state.value}
+                error={field.state.meta.errors?.[0]?.toString()}
               />
             )}
-            name="field"
-          />
+          </form.Field>
 
           {/*Campo Año de Graduación*/}
-          <Controller
-            control={control}
-            name="graduationYear"
-            render={({ field: { value } }) => (
+          <form.Field name="graduationYear">
+            {(field) => (
               <>
                 <Text style={styles.label}>Año de Graduación</Text>
                 <TouchableOpacity
@@ -174,36 +163,44 @@ export default function EducationScreen() {
                 >
                   <Text
                     style={
-                      value
+                      field.state.value
                         ? styles.datePickerText
                         : styles.datePickerPlaceholder
                     }
                   >
-                    {value || "Seleccionar año"}
+                    {field.state.value || "Seleccionar año"}
                   </Text>
                 </TouchableOpacity>
               </>
             )}
-          />
+          </form.Field>
 
           {showDatePicker && (
-            <DateTimePicker
-              testID="dateTimePicker"
-              value={
-                graduationYearValue
-                  ? new Date(parseInt(graduationYearValue, 10), 0, 1)
-                  : new Date()
-              }
-              mode="date"
-              display="default"
-              onChange={onDateChange}
-            />
+            <form.Subscribe selector={(state) => state.values.graduationYear}>
+              {(graduationYear) => (
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={
+                    graduationYear
+                      ? new Date(parseInt(graduationYear, 10), 0, 1)
+                      : new Date()
+                  }
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                />
+              )}
+            </form.Subscribe>
           )}
 
-          <NavigationButton
-            title="Agregar Educación"
-            onPress={handleSubmit(handleAdd, handleAddError)}
-          />
+          <form.Subscribe selector={(state) => [state.canSubmit]}>
+            {([canSubmit]) => (
+              <NavigationButton
+                title="Agregar Educación"
+                onPress={form.handleSubmit}
+              />
+            )}
+          </form.Subscribe>
 
           {cvData.education.length > 0 && (
             <>
@@ -244,7 +241,7 @@ export default function EducationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F4F6F9", 
+    backgroundColor: "#F4F6F9",
   },
   content: {
     padding: 16,
@@ -252,18 +249,18 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#0033A0", 
+    color: "#0033A0",
     marginBottom: 24,
   },
   listTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#0033A0", 
+    color: "#0033A0",
     marginTop: 24,
     marginBottom: 12,
   },
   card: {
-    backgroundColor: "#FFFFFF", 
+    backgroundColor: "#FFFFFF",
     borderRadius: 8,
     padding: 16,
     marginBottom: 12,
@@ -282,28 +279,28 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#333333", 
+    color: "#333333",
     marginBottom: 4,
   },
   cardSubtitle: {
     fontSize: 14,
-    color: "#7A7A7A", 
+    color: "#7A7A7A",
     marginBottom: 4,
   },
   cardInstitution: {
     fontSize: 14,
-    color: "#7A7A7A", 
+    color: "#7A7A7A",
     marginBottom: 2,
   },
   cardDate: {
     fontSize: 12,
-    color: "#7A7A7A", 
+    color: "#7A7A7A",
   },
   deleteButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#C41230", 
+    backgroundColor: "#C41230",
     justifyContent: "center",
     alignItems: "center",
     marginLeft: 16,
@@ -315,7 +312,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: "#7A7A7A", 
+    color: "#7A7A7A",
     marginBottom: 8,
   },
   datePickerInput: {
@@ -325,21 +322,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: "#DDDDDD", 
+    borderColor: "#DDDDDD",
     marginBottom: 16,
   },
   datePickerText: {
     fontSize: 16,
-    color: "#333333", 
+    color: "#333333",
   },
   datePickerPlaceholder: {
     fontSize: 16,
-    color: "#7A7A7A", 
+    color: "#7A7A7A",
   },
   errorText: {
-    color: "#C41230", 
+    color: "#C41230",
     fontSize: 12,
-    marginTop: -12, 
+    marginTop: -12,
     marginBottom: 8,
   },
 });
