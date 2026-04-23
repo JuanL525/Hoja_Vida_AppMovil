@@ -6,6 +6,7 @@ interface NavigationButtonProps {
     onPress: () => void;
     variant?: "primary" | "secondary" | "danger";
     style?: ViewStyle;
+    icon?: React.ReactNode;
 }
 
 export const NavigationButton = ({
@@ -13,6 +14,7 @@ export const NavigationButton = ({
   onPress,
   variant = "primary",
   style,
+  icon,
 }: NavigationButtonProps) => {
   // Determina el estilo del texto basado en la variante
   const textStyle = [
@@ -26,7 +28,10 @@ export const NavigationButton = ({
             onPress={onPress}
             activeOpacity={0.8}
         >
-      <Text style={textStyle}>{title}</Text>
+      {icon}
+      <Text style={[textStyle, icon ? { marginLeft: 8 } : {}]}>
+        {title}
+      </Text>
         </TouchableOpacity>
     );
 }
@@ -37,6 +42,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         alignItems: "center",
         justifyContent: "center",
+        flexDirection: "row",
         marginVertical: 8,
     },
 

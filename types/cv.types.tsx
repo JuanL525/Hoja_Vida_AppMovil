@@ -4,6 +4,7 @@ export interface PersonalInfo {
     phone: string;
     location: string;
     summary: string;
+    profileImage?: string; // URL de la imagen de perfil
 }
 
 export interface Experience {

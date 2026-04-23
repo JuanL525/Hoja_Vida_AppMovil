@@ -9,6 +9,7 @@ import { NavigationButton } from "../components/NavigationButton";
 import { useCVContext } from "../context/CVContext";
 import { PersonalInfo } from "../types/cv.types";
 
+
 export default function PersonalInfoScreen() {
   const router = useRouter();
   const { cvData, updatePersonalInfo } = useCVContext();

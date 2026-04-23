@@ -1,13 +1,14 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -132,7 +133,7 @@ export default function SkillsScreen() {
                     style={styles.deleteButton}
                     onPress={() => handleDelete(skill.id)}
                   >
-                    <Text style={styles.deleteButtonText}>✕</Text>
+                    <Ionicons name="trash-outline" size={18} color="#FFFFFF" />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -239,10 +240,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginLeft: 16,
-  },
-  deleteButtonText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "bold",
   },
 });

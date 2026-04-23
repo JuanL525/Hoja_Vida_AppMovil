@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
@@ -219,7 +220,7 @@ export default function EducationScreen() {
                     style={styles.deleteButton}
                     onPress={() => handleDelete(edu.id)}
                   >
-                    <Text style={styles.deleteButtonText}>✕</Text>
+                    <Ionicons name="trash-outline" size={18} color="#FFFFFF" />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -305,11 +306,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginLeft: 16,
   },
-  deleteButtonText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
   label: {
     fontSize: 14,
     color: "#7A7A7A",
@@ -327,16 +323,10 @@ const styles = StyleSheet.create({
   },
   datePickerText: {
     fontSize: 16,
-    color: "#333333",
+    color: "#333333", // Texto Principal
   },
   datePickerPlaceholder: {
     fontSize: 16,
-    color: "#7A7A7A",
-  },
-  errorText: {
-    color: "#C41230",
-    fontSize: 12,
-    marginTop: -12,
-    marginBottom: 8,
+    color: "#7A7A7A", // Texto Secundario
   },
 });

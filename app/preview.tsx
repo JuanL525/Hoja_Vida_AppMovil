@@ -1,9 +1,10 @@
 import { CVPreview } from "@/components/CVPreview";
 import { useCVContext } from "@/context/CVContext";
-import React from "react";
-import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { generatePDFHtml } from '../utils/pdfGenerator'; // Importamos la función
 
 export default function PreviewScreen() {
@@ -29,6 +30,7 @@ export default function PreviewScreen() {
             <CVPreview cvData={cvData} />
             
             <TouchableOpacity style={styles.exportButton} onPress={exportAndSharePDF}>
+                <Ionicons name="share-outline" size={20} color="#FFFFFF" />
                 <Text style={styles.exportButtonText}>Exportar y Compartir PDF</Text>
             </TouchableOpacity>
         </View>
@@ -46,11 +48,14 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 8,
         alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
         marginTop: 16,
     },
     exportButtonText: {
         color: '#FFFFFF',
         fontWeight: 'bold',
         fontSize: 16,
+        marginLeft: 8,
     }
 });

@@ -35,6 +35,10 @@ export default function RootLayout() {
           name="skills"
           options={{ title: "Habilidades" }}
         />
+        <Stack.Screen
+          name="photo"
+          options={{ title: "Foto de Perfil" }}
+        />
       </Stack>
     </CVProvider>
   )

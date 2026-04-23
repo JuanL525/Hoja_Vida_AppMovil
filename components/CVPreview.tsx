@@ -1,5 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { CVData } from "../types/cv.types";
 
 interface CVPreviewProps {
@@ -11,28 +12,46 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Header con información personal */}
+      {/* Header con foto */}
       <View style={styles.header}>
-        <Text style={styles.name}>
-          {personalInfo.fullName || "Nombre Completo"}
-        </Text>
-        <View style={styles.contactInfo}>
-          {personalInfo.email && (
-            <Text style={styles.contactText}>📧 {personalInfo.email}</Text>
-          )}
-          {personalInfo.phone && (
-            <Text style={styles.contactText}>📱 {personalInfo.phone}</Text>
-          )}
-          {personalInfo.location && (
-            <Text style={styles.contactText}>📍 {personalInfo.location}</Text>
-          )}
+        {personalInfo.profileImage && (
+          <Image
+            source={{ uri: personalInfo.profileImage }}
+            style={styles.profileImage}
+          />
+        )}
+        <View style={styles.headerText}>
+          <Text style={styles.name}>{personalInfo.fullName || "Nombre"}</Text>
+          <View style={styles.contactInfo}>
+            {personalInfo.email && (
+              <View style={styles.contactItem}>
+                <Ionicons name="mail" size={14} color="#7A7A7A" />
+                <Text style={styles.contactText}> {personalInfo.email}</Text>
+              </View>
+            )}
+            {personalInfo.phone && (
+              <View style={styles.contactItem}>
+                <Ionicons name="call" size={14} color="#7A7A7A" />
+                <Text style={styles.contactText}> {personalInfo.phone}</Text>
+              </View>
+            )}
+            {personalInfo.location && (
+              <View style={styles.contactItem}>
+                <Ionicons name="location" size={14} color="#7A7A7A" />
+                <Text style={styles.contactText}> {personalInfo.location}</Text>
+              </View>
+            )}
+          </View>
         </View>
       </View>
 
       {/* Resumen profesional */}
       {personalInfo.summary && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>RESUMEN PROFESIONAL</Text>
+          <Text style={styles.sectionTitle}>
+            <Ionicons name="document-text-outline" size={18} color="#0033A0" />
+            {' '}RESUMEN PROFESIONAL
+          </Text>
           <Text style={styles.summaryText}>{personalInfo.summary}</Text>
         </View>
       )}
@@ -40,7 +59,10 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
       {/* Experiencia laboral */}
       {experiences.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>EXPERIENCIA LABORAL</Text>
+          <Text style={styles.sectionTitle}>
+            <Ionicons name="briefcase-outline" size={18} color="#0033A0" />
+            {' '}EXPERIENCIA LABORAL
+          </Text>
           {experiences.map((exp) => (
             <View key={exp.id} style={styles.item}>
               <Text style={styles.itemTitle}>{exp.position}</Text>
@@ -59,7 +81,10 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
       {/* Educación */}
       {education.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>EDUCACIÓN</Text>
+          <Text style={styles.sectionTitle}>
+            <Ionicons name="school-outline" size={18} color="#0033A0" />
+            {' '}EDUCACIÓN
+          </Text>
           {education.map((edu) => (
             <View key={edu.id} style={styles.item}>
               <Text style={styles.itemTitle}>{edu.degree}</Text>
@@ -78,7 +103,10 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
       {/* Habilidades */}
       {skills.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>HABILIDADES</Text>
+          <Text style={styles.sectionTitle}>
+            <Ionicons name="star-outline" size={18} color="#0033A0" />
+            {' '}HABILIDADES
+          </Text>
           <View style={styles.skillsContainer}>
             {skills.map((skill) => (
               <View key={skill.id} style={styles.skillBadge}>
@@ -122,10 +150,23 @@ const styles = StyleSheet.create({
     padding: 24, // Espaciado institucional
   },
   header: {
+    flexDirection: "row",
+    marginBottom: 24,
+    alignItems: "center",
     borderBottomWidth: 2,
     borderBottomColor: "#0033A0", // Azul Politécnico
     paddingBottom: 16,
-    marginBottom: 24,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginRight: 16,
+    borderWidth: 3,
+    borderColor: "#0033A0", // Azul Politécnico
+  },
+  headerText: {
+    flex: 1,
   },
   name: {
     fontSize: 32,
@@ -135,6 +176,10 @@ const styles = StyleSheet.create({
   },
   contactInfo: {
     gap: 4,
+  },
+  contactItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   contactText: {
     fontSize: 14,
@@ -150,6 +195,9 @@ const styles = StyleSheet.create({
     color: "#0033A0", // Azul Politécnico
     marginBottom: 16,
     letterSpacing: 1,
+    borderBottomWidth: 2,
+    borderBottomColor: "#0033A0",
+    paddingBottom: 4,
   },
   summaryText: {
     fontSize: 14,
@@ -189,18 +237,6 @@ const styles = StyleSheet.create({
     color: "#333333", // Texto Principal
     lineHeight: 20,
   },
-  emptyState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: "#7A7A7A", // Texto Secundario
-    textAlign: "center",
-    lineHeight: 24,
-  },
   skillsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -221,5 +257,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#7A7A7A", // Texto Secundario
     marginTop: 2,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 60,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#7A7A7A", // Texto Secundario
+    textAlign: "center",
+    lineHeight: 24,
   },
 });
